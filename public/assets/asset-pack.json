@@ -1,0 +1,83 @@
+{
+    "section1": {
+        "files": [
+            {
+                "url": "assets/background/Clouds 4/1.png",
+                "type": "image",
+                "key": "1"
+            },
+            {
+                "url": "assets/background/Clouds 4/2.png",
+                "type": "image",
+                "key": "2"
+            },
+            {
+                "url": "assets/background/Clouds 4/3.png",
+                "type": "image",
+                "key": "3"
+            },
+            {
+                "url": "assets/background/Clouds 4/4.png",
+                "type": "image",
+                "key": "4"
+            },
+            {
+                "url": "assets/animation.json",
+                "type": "animation",
+                "key": "animation"
+            },
+            {
+                "url": "assets/FufuSuperDino.png",
+                "type": "image",
+                "key": "FufuSuperDino"
+            },
+            {
+                "url": "assets/robot2/robo2masked/robo2jump-Sheet[48height32wide].png",
+                "frameConfig": {
+                    "frameWidth": 32,
+                    "frameHeight": 50,
+                    "startFrame": 0,
+                    "endFrame": -1,
+                    "spacing": 0,
+                    "margin": 0
+                },
+                "type": "spritesheet",
+                "key": "robo2jump-Sheet[48height32wide]"
+            },
+            {
+                "url": "assets/robot2/robo2masked/robo2run-Sheet[32height32wide].png",
+                "frameConfig": {
+                    "frameWidth": 32,
+                    "frameHeight": 32,
+                    "startFrame": 0,
+                    "endFrame": -1,
+                    "spacing": 0,
+                    "margin": 0
+                },
+                "type": "spritesheet",
+                "key": "robo2run-Sheet[32height32wide]"
+            },
+            {
+                "url": "assets/robot2/robo2masked/robot2dash-Sheet[32height32wide].png",
+                "frameConfig": {
+                    "frameWidth": 32,
+                    "frameHeight": 32,
+                    "startFrame": 0,
+                    "endFrame": -1,
+                    "spacing": 0,
+                    "margin": 0
+                },
+                "type": "spritesheet",
+                "key": "robot2dash-Sheet[32height32wide]"
+            }
+        ]
+    },
+    "meta": {
+        "app": "Phaser Editor 2D - Asset Pack Editor",
+        "contentType": "phasereditor2d.pack.core.AssetContentType",
+        "url": "https://phasereditor2d.com",
+        "version": 2,
+        "showAllFilesInBlocks": false,
+        "visible": true
+    }
+}

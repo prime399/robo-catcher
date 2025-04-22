@@ -1,0 +1,71 @@
+{
+    "id": "ead874aa-8dc7-4bdb-bb45-d0d0ae816cd0",
+    "sceneType": "SCENE",
+    "settings": {
+        "exportClass": true,
+        "autoImport": true,
+        "preloadPackFiles": [],
+        "createMethodName": "editorCreate",
+        "sceneKey": "MainScene",
+        "compilerOutputLanguage": "TYPE_SCRIPT",
+        "borderWidth": 1280,
+        "borderHeight": 720
+    },
+    "displayList": [
+        {
+            "type": "TileSprite",
+            "id": "5f1d232c-8cb7-457d-a3f5-32f0a10b8e0e",
+            "label": "_1",
+            "texture": {
+                "key": "1"
+            },
+            "x": 372,
+            "y": 273,
+            "width": 576,
+            "height": 324
+        },
+        {
+            "type": "TileSprite",
+            "id": "e5d94cf7-6535-4a2f-aad8-85ff3e8c3ffb",
+            "label": "_2",
+            "texture": {
+                "key": "2"
+            },
+            "x": 384,
+            "y": 345,
+            "width": 576,
+            "height": 324
+        },
+        {
+            "type": "TileSprite",
+            "id": "e89e3484-5636-4a8f-82f4-ef5270c1b5af",
+            "label": "_3",
+            "texture": {
+                "key": "3"
+            },
+            "x": 372,
+            "y": 384,
+            "width": 576,
+            "height": 324
+        },
+        {
+            "type": "TileSprite",
+            "id": "d4cdc58c-3803-4255-9573-89780a6152fb",
+            "label": "_4",
+            "texture": {
+                "key": "4"
+            },
+            "x": 419,
+            "y": 458,
+            "width": 576,
+            "height": 324
+        }
+    ],
+    "plainObjects": [],
+    "meta": {
+        "app": "Phaser Editor - Scene Editor",
+        "url": "https://phaser.io/editor",
+        "contentType": "phasereditor2d.core.scene.SceneContentType",
+        "version": 5
+    }
+}
