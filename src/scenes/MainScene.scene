@@ -76,16 +76,16 @@
             "unlock": [
                 "x",
                 "y",
-                "scaleX",
-                "scaleY",
                 "originX",
-                "originY"
+                "originY",
+                "scaleX",
+                "scaleY"
             ],
             "label": "player",
             "x": 10,
-            "y": 278,
-            "scaleX": 0.7,
-            "scaleY": 0.7,
+            "y": 272,
+            "scaleX": 1,
+            "scaleY": 1,
             "originX": 0.5,
             "originY": 0.5
         },

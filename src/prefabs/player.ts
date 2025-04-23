@@ -9,8 +9,9 @@ export default class Player extends Phaser.GameObjects.Sprite {
     constructor(scene: Phaser.Scene, x?: number, y?: number, texture?: string, frame?: number | string) {
         super(scene, x ?? 0, y ?? 0, texture || "robo2run-Sheet[32height32wide]", frame ?? 0);
 
-        this.scaleX = 2;
-        this.scaleY = 2;
+        // Don't set default scale here, let the scene files control it
+        // this.scaleX = 2;
+        // this.scaleY = 2;
 
         // this (components)
         scene.add.existing(this);

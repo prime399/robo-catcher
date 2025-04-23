@@ -1,10 +1,9 @@
-
 // You can write more code here
 
 /* START OF COMPILED CODE */
 
-import player from "../prefabs/player";
-import platform from "../prefabs/platform";
+import playerPrefab from "../prefabs/player";
+import platformPrefab from "../prefabs/platform";
 /* START-USER-IMPORTS */
 import Platform from "../prefabs/platform";
 import Player from "../prefabs/player";
@@ -25,36 +24,46 @@ export default class MainScene extends Phaser.Scene {
 		// _1
 		const _1 = this.add.tileSprite(280, 0, 576, 324, "1");
 		_1.setOrigin(0.5, 0);
+		_1.visible = false; // Hide the tileSprite background
 
 		// _2
 		const _2 = this.add.tileSprite(280, 0, 576, 324, "2");
 		_2.setOrigin(0.5, 0);
+		_2.visible = false; // Hide the tileSprite background
 
 		// _3
 		const _3 = this.add.tileSprite(280, 0, 576, 324, "3");
 		_3.setOrigin(0.5, 0);
+		_3.visible = false; // Hide the tileSprite background
 
 		// _4
 		const _4 = this.add.tileSprite(280, 0, 576, 324, "4");
 		_4.setOrigin(0.5, 0);
+		_4.visible = false; // Hide the tileSprite background
 
 		// main_overlay
 		const main_overlay = this.add.image(280, 0, "main overlay");
 		main_overlay.setOrigin(0.5, -0.3);
+		
+		// Store reference to the main overlay for later use
+		this.mainOverlay = main_overlay;
 
 		// player
-		const player = new player(this, 10, 278);
-		this.add.existing(player);
-		player.scaleX = 0.7;
-		player.scaleY = 0.7;
-		player.setOrigin(0.5, 0.5);
+		const playerInstance = new playerPrefab(this, 10, 272);
+		this.add.existing(playerInstance);
+		playerInstance.scaleX = 1.5;
+		playerInstance.scaleY = 1.5;
+		playerInstance.setOrigin(0.5, 0.5);
+		this.player = playerInstance as Player;
 
 		// mainPlatform
-		const mainPlatform = new platform(this, 145, 273);
+		const mainPlatform = new platformPrefab(this, 350, 390);
 		this.add.existing(mainPlatform);
 
 		// mainPlatform (prefab fields)
 		mainPlatform.numTiles = 6;
+		mainPlatform.setScale(1.9); // Apply 1.5 scale to match with player visually
+		this.mainPlatform = mainPlatform as Platform;
 
 		this.events.emit("scene-awake");
 	}
@@ -72,14 +81,13 @@ export default class MainScene extends Phaser.Scene {
 	private bg4Dup!: Phaser.GameObjects.Image;
 	private player!: Player;
 	private mainPlatform!: Platform;
-	private platform1!: Platform;
-	private platform2!: Platform;
 	private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
 	private leftButton!: Phaser.GameObjects.Rectangle;
 	private rightButton!: Phaser.GameObjects.Rectangle;
 	private jumpButton!: Phaser.GameObjects.Rectangle;
 	private dashButton!: Phaser.GameObjects.Rectangle;
 	private isMobile: boolean = true;
+	private mainOverlay!: Phaser.GameObjects.Image;
 	// private speed: number = 200; // Default movement speed
 
 	create() {
@@ -115,32 +123,52 @@ export default class MainScene extends Phaser.Scene {
 			bg.setScale(bgScale);
 		});
 
-		// Add the main overlay and scale it to fit the screen
-		const main_overlay = this.add.image(width / 2, height / 2, "main overlay");
-		main_overlay.setOrigin(0.5, 0.5);
-
-		// Calculate scale to fit the screen width
-		const scaleX = width / main_overlay.width;
-		const scaleY = height / main_overlay.height;
-		const scale = Math.max(scaleX, scaleY); // Use the larger scale to ensure full coverage
-
-		main_overlay.setScale(scale);
-		main_overlay.setDepth(1); // Set a lower depth for the overlay
-
 		// Call editorCreate to create the player and platforms from the scene file
 		this.editorCreate();
+
+		// Make sure the main overlay is properly positioned and scaled
+		// This ensures proper scaling even if the scene file changes
+		this.mainOverlay.setPosition(width / 2, height / 2);
+		this.mainOverlay.setOrigin(0.5, 0.5);
+		const overlayScaleX = width / this.mainOverlay.width;
+		const overlayScaleY = height / this.mainOverlay.height;
+		const overlayScale = Math.max(overlayScaleX, overlayScaleY); 
+		this.mainOverlay.setScale(overlayScale);
+		this.mainOverlay.setDepth(1);
 
 		// Add physics to the player if not already added
 		if (!this.player.body) {
 			this.physics.add.existing(this.player);
 			const playerBody = this.player.body as Phaser.Physics.Arcade.Body;
 			playerBody.setCollideWorldBounds(true);
+
+			// Adjust physics body size to match the scaled sprite
+			// The player sprite is 32x32 with scale of 1.0
+			const scaledWidth = 16;  // Half width for better collision
+			const scaledHeight = 32;
+			playerBody.setSize(scaledWidth, scaledHeight);
+			playerBody.setOffset((32 - scaledWidth) / 2, 0);
 		}
 
-		// Add collision between player and all platforms
+		// Add physics to platforms if needed
+		if (this.mainPlatform) {
+			// Make sure physics are added if not already
+			if (!this.mainPlatform.body) {
+				this.physics.add.existing(this.mainPlatform, true); // true makes it static
+			}
+
+			// After ensuring physics is added, now we can safely access the body
+			const platformBody = this.mainPlatform.body as Phaser.Physics.Arcade.StaticBody;
+			// Apply scale factor to physics body
+			const platformScale = 1.5; // same as visual scale
+			platformBody.setSize(
+				this.mainPlatform.getWidth() * platformScale, 
+				this.mainPlatform.getHeight() * platformScale
+			);
+		}
+
+		// Add collider for the player and main platform
 		this.physics.add.collider(this.player, this.mainPlatform);
-		this.physics.add.collider(this.player, this.platform1);
-		this.physics.add.collider(this.player, this.platform2);
 
 		// Set up keyboard controls
 		this.cursors = this.input.keyboard?.createCursorKeys() || {} as Phaser.Types.Input.Keyboard.CursorKeys;
