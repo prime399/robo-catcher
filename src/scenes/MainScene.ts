@@ -60,7 +60,7 @@ export default class MainScene extends Phaser.Scene {
 
 		// mainPlatform (prefab fields)
 		mainPlatform.numTiles = 6;
-		mainPlatform.setScale(1.9); // Apply 1.5 scale to match with player visually
+		// Removed setScale(1.9) - Scaling is handled internally by the prefab now
 		this.mainPlatform = mainPlatform as Platform;
 
 		// We're now creating ground in setupWorldObjects instead
@@ -163,14 +163,7 @@ export default class MainScene extends Phaser.Scene {
 				this.physics.add.existing(this.mainPlatform, true); // true makes it static
 			}
 
-			// After ensuring physics is added, now we can safely access the body
-			const platformBody = this.mainPlatform.body as Phaser.Physics.Arcade.StaticBody;
-			// Apply scale factor to physics body
-			const platformScale = 1.5; // same as visual scale
-			platformBody.setSize(
-				this.mainPlatform.getWidth() * platformScale, 
-				this.mainPlatform.getHeight() * platformScale
-			);
+			// Removed manual body resizing - Prefab handles its own body size based on internal scaling
 		}
 
 		// Set up world borders and other collision objects AFTER physics have been added to player and platforms
@@ -228,13 +221,14 @@ export default class MainScene extends Phaser.Scene {
 		const width = this.scale.width;
 		const height = this.scale.height;
 
-		// Add borders to prevent player from leaving the screen
-		this.addBorder(0, height/2, 20, height); // Left border
-		this.addBorder(width, height/2, 20, height); // Right border
+		// Add thin borders on the left and right edges covering full screen height
+		const borderThickness = 2;
+		this.addBorder(0, 0, borderThickness, height); // Left border
+		this.addBorder(width - borderThickness, 0, borderThickness, height); // Right border
 		
 		// Create main ground explicitly with the exact same properties as the original one
 		// This ensures it's properly set up in our new system
-		const mainGround = this.addGround(0, 430, 300, 20, 0x00ff00);
+		const mainGround = this.addGround(0, 440, 300, 20, 0x00ff00);
 		// Store it for reference if needed
 		this.mainGround = mainGround;
 		
@@ -270,11 +264,11 @@ export default class MainScene extends Phaser.Scene {
 		// Make sure the physics body matches the visual size
 		body.setSize(width, height);
 		
-		// Enable collision on all sides with immovable flag
-		body.checkCollision.down = true;
+		// Enable collision only on the top surface for platforms
+		body.checkCollision.down = false;
 		body.checkCollision.up = true;
-		body.checkCollision.left = true;
-		body.checkCollision.right = true;
+		body.checkCollision.left = false;
+		body.checkCollision.right = false;
 		body.immovable = true;
 		
 		// Add it to the world objects group 
@@ -319,7 +313,20 @@ export default class MainScene extends Phaser.Scene {
 		const box = this.add.rectangle(x, y, width, height, color).setOrigin(0, 0);
 		
 		// Add physics to the box BEFORE adding to the group
-		this.physics.add.existing(box, true);
+		this.physics.add.existing(box, true); // true makes it static
+
+		// Get the physics body to adjust properties
+		const body = box.body as Phaser.Physics.Arcade.StaticBody;
+
+		// Make sure the physics body matches the visual size
+		body.setSize(width, height);
+
+		// Enable collision only on the top surface for boxes
+		body.checkCollision.down = false;
+		body.checkCollision.up = true;
+		body.checkCollision.left = false;
+		body.checkCollision.right = false;
+		body.immovable = true;
 		
 		// Add it to the world objects group
 		this.worldObjects.push(box);

@@ -5,7 +5,7 @@
 /* START-USER-IMPORTS */
 /* END-USER-IMPORTS */
 
-export default class platform extends Phaser.GameObjects.Container {
+export default class Platform extends Phaser.GameObjects.Container { // Renamed to Platform
 
 	constructor(scene: Phaser.Scene, x?: number, y?: number) {
 		super(scene, x ?? 0, y ?? 0);
@@ -58,8 +58,11 @@ export default class platform extends Phaser.GameObjects.Container {
 
         // Adjust the physics body size to match the platform
         const body = this.body as Phaser.Physics.Arcade.Body;
-        body.setSize(this.numTiles * this.tileWidth, 16);
-        body.setOffset(0, 0);
+        // Use scaled tile dimensions for physics body
+        const scaledTileWidth = this.tileWidth * 1.5;
+        const scaledTileHeight = 16 * 1.5; // Assuming original tile height was 16
+        body.setSize(this.numTiles * scaledTileWidth, scaledTileHeight);
+        body.setOffset(0, 0); // Offset remains 0 relative to container
 
         // Set depth to ensure visibility
         this.setDepth(15);
@@ -67,6 +70,7 @@ export default class platform extends Phaser.GameObjects.Container {
 	}
 
 	public numTiles: number = 6;
+	private tileWidth: number = 16; // Define base tile width
 
 	/* START-USER-CODE */
 
@@ -76,14 +80,17 @@ export default class platform extends Phaser.GameObjects.Container {
     }
 
     // This method will be called by the Phaser Editor when the object is created
+    // Use Platform (PascalCase) for class name and return type
     static create(scene: Phaser.Scene, x: number, y: number, numTiles: number = 6): Platform {
-        const platform = new Platform(scene, x, y);
+        // Use platformInstance (camelCase) for variable name
+        const platformInstance = new Platform(scene, x, y);
 
         if (numTiles !== 6) {
-            platform.updatePlatformSize(numTiles);
+            // Use platformInstance here too
+            platformInstance.updatePlatformSize(numTiles);
         }
 
-        return platform;
+        return platformInstance; // Return the instance
     }
 
     // Update the platform size based on the number of tiles
@@ -101,23 +108,31 @@ export default class platform extends Phaser.GameObjects.Container {
             if (i === numTiles - 1) tileFrame = 724; // Right edge
 
             const tile = this.scene.add.image(i * this.tileWidth, 0, "world_7_tileset", tileFrame);
+            // Apply scaling to individual tiles
+            tile.scaleX = 1.5;
+            tile.scaleY = 1.5;
             tile.setOrigin(0, 0);
             this.add(tile);
         }
 
         // Update the physics body size
         const body = this.body as Phaser.Physics.Arcade.Body;
-        body.setSize(numTiles * this.tileWidth, 16);
+        // Use scaled tile dimensions for physics body
+        const scaledTileWidth = this.tileWidth * 1.5;
+        const scaledTileHeight = 16 * 1.5; // Assuming original tile height was 16
+        body.setSize(numTiles * scaledTileWidth, scaledTileHeight);
     }
 
-    // Method to get the width of the platform
+    // Method to get the width of the platform (returns visual width)
     getWidth(): number {
-        return this.numTiles * this.tileWidth;
+        // Return visual width based on scaled tiles
+        return this.numTiles * this.tileWidth * 1.5;
     }
 
-    // Method to get the height of the platform
+    // Method to get the height of the platform (returns visual height)
     getHeight(): number {
-        return 16; // The height of a single tile
+        // Return visual height based on scaled tiles
+        return 16 * 1.5;
     }
 
     /* END-USER-CODE */

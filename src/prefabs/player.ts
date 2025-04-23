@@ -23,10 +23,13 @@ export default class Player extends Phaser.GameObjects.Sprite {
         // Set up physics body
         const body = this.body as Phaser.Physics.Arcade.Body;
         body.setCollideWorldBounds(true);
-        body.setSize(16, 32); // Adjust hitbox size
+        // Set hitbox size
+        body.setSize(20, 24); // Wider (20px), lower half height (24px)
+        // Set initial offset for idle animation (48px height)
+        body.setOffset(6, 24);
         
-        // Start with running animation
-        this.play("robot running", true);
+        // Start with idle animation
+        this.play("robo idle", true);
         
         // Set depth to ensure visibility
         this.setDepth(20);
@@ -52,26 +55,41 @@ export default class Player extends Phaser.GameObjects.Sprite {
     
     // Update method to handle player movement
     update(cursors: Phaser.Types.Input.Keyboard.CursorKeys, leftButtonPressed: boolean = false, rightButtonPressed: boolean = false, jumpButtonPressed: boolean = false, dashButtonPressed: boolean = false): void {
-        // Handle keyboard and touch input for robot movement
+        
+        let targetAnimKey: string | null = null;
+        let targetOffsetY: number | null = null;
+
+        // Determine target animation and offset based on input
         if (cursors.left?.isDown || leftButtonPressed) {
             this.x -= this.speed * (this.scene.game.loop.delta / 1000);
-            this.setFlipX(true); // Flip sprite when moving left
-            this.play("robot running", true);
+            this.setFlipX(true);
+            targetAnimKey = "robot running";
+            targetOffsetY = 8; // Offset for 32px frame
         } else if (cursors.right?.isDown || rightButtonPressed) {
             this.x += this.speed * (this.scene.game.loop.delta / 1000);
-            this.setFlipX(false); // Normal orientation when moving right
-            this.play("robot running", true);
+            this.setFlipX(false);
+            targetAnimKey = "robot running";
+            targetOffsetY = 8; // Offset for 32px frame
         } else if (cursors.up?.isDown || jumpButtonPressed) {
-            // Jump animation
-            this.play("robot jumping", true);
+            targetAnimKey = "robot jumping";
+            targetOffsetY = 24; // Offset for 48px frame
         } else if (cursors.down?.isDown || dashButtonPressed) {
-            // Dash animation
-            this.play("robot dash", true);
+            targetAnimKey = "robot dash";
+            targetOffsetY = 8; // Offset for 32px frame
         } else {
-            // If no keys are pressed, keep the running animation but don't move
-            if (this.anims.currentAnim && this.anims.currentAnim.key !== "robot running") {
-                this.play("robot running", true);
+            // Idle state
+            this.body.velocity.x = 0; // Stop horizontal movement
+            targetAnimKey = "robo idle";
+            targetOffsetY = 24; // Offset for 48px frame
+        }
+
+        // Change animation and offset only if needed
+        if (targetAnimKey && this.anims.currentAnim?.key !== targetAnimKey) {
+            // Set offset BEFORE playing animation
+            if (targetOffsetY !== null) {
+                 this.body.setOffset(6, targetOffsetY);
             }
+            this.play(targetAnimKey, true);
         }
         
         // Keep the robot within the screen bounds

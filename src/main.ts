@@ -55,6 +55,13 @@ window.addEventListener("load", function () {
   // Create the game instance
   const game = new Phaser.Game(gameConfig);
 
+  // Trigger fullscreen on the first user interaction using DOM event listener
+  game.canvas.addEventListener('pointerdown', () => {
+    if (!game.scale.isFullscreen) {
+        game.scale.startFullscreen();
+    }
+  }, { once: true }); // Use { once: true } to automatically remove the listener after first trigger
+
   // Mobile optimizations
   if (isMobile) {
     // Add viewport meta tag for better mobile display

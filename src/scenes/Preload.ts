@@ -51,6 +51,7 @@ export default class Preload extends Phaser.Scene {
     this.editorCreate();
 
     this.load.pack("asset-pack", "/assets/asset-pack.json"); // Use absolute path from root
+    this.load.animation('robo_anims', '/assets/animation.json'); // Load the animation definitions
 
     const width = this.progressBar.width;
 
