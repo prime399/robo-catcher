@@ -38,7 +38,7 @@ export default class Player extends Phaser.GameObjects.Sprite {
 
     public speed: number = 200;
     declare public body: Phaser.Physics.Arcade.Body;
-
+    public jumpPower: number = 600; // Added jump power property
     /* START-USER-CODE */
 
     // This method will be called by the Phaser Editor when creating the object
@@ -55,46 +55,63 @@ export default class Player extends Phaser.GameObjects.Sprite {
     
     // Update method to handle player movement
     update(cursors: Phaser.Types.Input.Keyboard.CursorKeys, leftButtonPressed: boolean = false, rightButtonPressed: boolean = false, jumpButtonPressed: boolean = false, dashButtonPressed: boolean = false): void {
-        
-        let targetAnimKey: string | null = null;
-        let targetOffsetY: number | null = null;
 
-        // Determine target animation and offset based on input
+        // Declare variables ONCE
+        let targetAnimKey: string | null = "robo idle"; // Default to idle
+        let targetOffsetY: number = 24; // Default offset for idle (48px frame)
+        const onGround = this.body.blocked.down;
+
+        // Horizontal Movement & Animation
         if (cursors.left?.isDown || leftButtonPressed) {
-            this.x -= this.speed * (this.scene.game.loop.delta / 1000);
+            this.body.setVelocityX(-this.speed);
             this.setFlipX(true);
-            targetAnimKey = "robot running";
-            targetOffsetY = 8; // Offset for 32px frame
+            if (onGround) { // Only run anim if on ground
+                 targetAnimKey = "robot running";
+                 targetOffsetY = 8; // Offset for 32px frame
+            }
         } else if (cursors.right?.isDown || rightButtonPressed) {
-            this.x += this.speed * (this.scene.game.loop.delta / 1000);
+            this.body.setVelocityX(this.speed);
             this.setFlipX(false);
-            targetAnimKey = "robot running";
-            targetOffsetY = 8; // Offset for 32px frame
-        } else if (cursors.up?.isDown || jumpButtonPressed) {
-            targetAnimKey = "robot jumping";
-            targetOffsetY = 24; // Offset for 48px frame
-        } else if (cursors.down?.isDown || dashButtonPressed) {
-            targetAnimKey = "robot dash";
-            targetOffsetY = 8; // Offset for 32px frame
+             if (onGround) { // Only run anim if on ground
+                 targetAnimKey = "robot running";
+                 targetOffsetY = 8; // Offset for 32px frame
+             }
         } else {
-            // Idle state
-            this.body.velocity.x = 0; // Stop horizontal movement
-            targetAnimKey = "robo idle";
+            // Idle state (if on ground)
+            this.body.setVelocityX(0);
+            if (onGround) {
+                targetAnimKey = "robo idle";
+                targetOffsetY = 24; // Offset for 48px frame
+            }
+        }
+
+        // Jump Logic
+        if ((cursors.up?.isDown || jumpButtonPressed) && onGround) {
+            this.body.setVelocityY(-this.jumpPower);
+            // Jump animation will be set below if airborne
+        }
+
+        // Dash Logic & Animation (Overrides other ground animations)
+        if (cursors.down?.isDown || dashButtonPressed) {
+             targetAnimKey = "robot dash";
+             targetOffsetY = 8; // Offset for 32px frame
+             // Optional: Add dash velocity logic here if needed
+        }
+
+        // Airborne Animation (Overrides ground/idle anims if not dashing)
+        if (!onGround && targetAnimKey !== "robot dash") {
+            targetAnimKey = "robot jumping";
             targetOffsetY = 24; // Offset for 48px frame
         }
 
         // Change animation and offset only if needed
         if (targetAnimKey && this.anims.currentAnim?.key !== targetAnimKey) {
             // Set offset BEFORE playing animation
-            if (targetOffsetY !== null) {
-                 this.body.setOffset(6, targetOffsetY);
-            }
+            this.body.setOffset(6, targetOffsetY); // Use determined offset
             this.play(targetAnimKey, true);
         }
-        
-        // Keep the robot within the screen bounds
-        if (this.x < 0) this.x = 0;
-        if (this.x > this.scene.scale.width) this.x = this.scene.scale.width;
+
+        // Removed manual bounds checking - Handled by physics world bounds now
     }
 
     /* END-USER-CODE */

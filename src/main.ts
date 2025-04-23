@@ -45,8 +45,8 @@ window.addEventListener("load", function () {
     physics: {
       default: "arcade",
       arcade: {
-        gravity: { x: 0, y: 300 },
-        debug: false
+        gravity: { x: 0, y: 1000 }, // Increased gravity
+        debug: true // Enabled physics debugging
       }
     },
     scene: [Boot, Preload, MainScene, Level],

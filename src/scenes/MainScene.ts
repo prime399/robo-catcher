@@ -73,13 +73,10 @@ export default class MainScene extends Phaser.Scene {
 
 	// Property declarations
 	private bg1!: Phaser.GameObjects.Image;
-	private bg1Dup!: Phaser.GameObjects.Image;
+	// Removed duplicate background images (bg1Dup, etc.)
 	private bg2!: Phaser.GameObjects.Image;
-	private bg2Dup!: Phaser.GameObjects.Image;
 	private bg3!: Phaser.GameObjects.Image;
-	private bg3Dup!: Phaser.GameObjects.Image;
 	private bg4!: Phaser.GameObjects.Image;
-	private bg4Dup!: Phaser.GameObjects.Image;
 	private player!: Player;
 	private mainPlatform!: Platform;
 	private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -106,34 +103,33 @@ export default class MainScene extends Phaser.Scene {
 		this.setupFullscreen();
 
 		// Get scene dimensions (assuming default or set elsewhere)
-		const width = this.scale.width;
-		const height = this.scale.height;
+		const gameWidth = this.scale.width; // Game view width
+		const gameHeight = this.scale.height; // Game view height
+		const worldWidth = 2000; // Define the total width of your scrollable world
+		const worldHeight = gameHeight; // Keep world height same as game height for now
 
-		// Create background layers using regular images instead of tileSprites
-		// Each layer needs two images side by side for seamless scrolling
+		// Create background layers with scroll factors for parallax
+		// Ensure background images are wide enough or use tileSprites if worldWidth is very large
 
-		// Layer 1 (farthest)
-		this.bg1 = this.add.image(0, 0, "1").setOrigin(0, 0).setScrollFactor(0);
-		this.bg1Dup = this.add.image(width, 0, "1").setOrigin(0, 0).setScrollFactor(0);
+		// Layer 1 (farthest) - Slowest scroll
+		this.bg1 = this.add.image(0, 0, "1").setOrigin(0, 0).setScrollFactor(0.2);
 
 		// Layer 2
-		this.bg2 = this.add.image(0, 0, "2").setOrigin(0, 0).setScrollFactor(0);
-		this.bg2Dup = this.add.image(width, 0, "2").setOrigin(0, 0).setScrollFactor(0);
+		this.bg2 = this.add.image(0, 0, "2").setOrigin(0, 0).setScrollFactor(0.4);
 
 		// Layer 3
-		this.bg3 = this.add.image(0, 0, "3").setOrigin(0, 0).setScrollFactor(0);
-		this.bg3Dup = this.add.image(width, 0, "3").setOrigin(0, 0).setScrollFactor(0);
+		this.bg3 = this.add.image(0, 0, "3").setOrigin(0, 0).setScrollFactor(0.6);
 
-		// Layer 4 (closest)
-		this.bg4 = this.add.image(0, 0, "4").setOrigin(0, 0).setScrollFactor(0);
-		this.bg4Dup = this.add.image(width, 0, "4").setOrigin(0, 0).setScrollFactor(0);
+		// Layer 4 (closest) - Fastest scroll (but less than 1)
+		this.bg4 = this.add.image(0, 0, "4").setOrigin(0, 0).setScrollFactor(0.8);
 
-		// Scale all backgrounds to fit the screen height without stretching
-		const bgScale = height / this.bg1.height;
+		// Scale all backgrounds to fit the screen height
+		const bgScale = gameHeight / this.bg1.height; // Use gameHeight
 
-		[this.bg1, this.bg1Dup, this.bg2, this.bg2Dup,
-		 this.bg3, this.bg3Dup, this.bg4, this.bg4Dup].forEach(bg => {
+		[this.bg1, this.bg2, this.bg3, this.bg4].forEach(bg => {
 			bg.setScale(bgScale);
+			// Optional: If bg images are smaller than worldWidth, consider tiling or stretching
+			// bg.displayWidth = worldWidth; // Example: Stretch to world width (might look bad)
 		});
 
 		// Call editorCreate to create the player and platforms from the scene file
@@ -146,7 +142,8 @@ export default class MainScene extends Phaser.Scene {
 		if (!this.player.body) {
 			this.physics.add.existing(this.player);
 			const playerBody = this.player.body as Phaser.Physics.Arcade.Body;
-			playerBody.setCollideWorldBounds(true);
+			// Player collision with world bounds will be handled by physics world bounds
+			// playerBody.setCollideWorldBounds(true); // Remove this if using world bounds
 
 			// Adjust physics body size to match the scaled sprite
 			// The player sprite is 32x32 with scale of 1.0
@@ -171,13 +168,15 @@ export default class MainScene extends Phaser.Scene {
 
 		// Make sure the main overlay is properly positioned and scaled
 		// This ensures proper scaling even if the scene file changes
-		this.mainOverlay.setPosition(width / 2, height / 2);
+		// Make overlay fixed to camera
+		this.mainOverlay.setPosition(gameWidth / 2, gameHeight / 2); // Position relative to camera view
 		this.mainOverlay.setOrigin(0.5, 0.5);
-		const overlayScaleX = width / this.mainOverlay.width;
-		const overlayScaleY = height / this.mainOverlay.height;
-		const overlayScale = Math.max(overlayScaleX, overlayScaleY); 
+		const overlayScaleX = gameWidth / this.mainOverlay.width;
+		const overlayScaleY = gameHeight / this.mainOverlay.height;
+		const overlayScale = Math.max(overlayScaleX, overlayScaleY);
 		this.mainOverlay.setScale(overlayScale);
 		this.mainOverlay.setDepth(1);
+		this.mainOverlay.setScrollFactor(0); // Make overlay fixed
 
 		// Add directly a simple collider without callback parameters to avoid TypeScript warnings
 		this.physics.add.collider(this.player, this.worldObjects);
@@ -195,9 +194,17 @@ export default class MainScene extends Phaser.Scene {
 		// Set up keyboard controls
 		this.cursors = this.input.keyboard?.createCursorKeys() || {} as Phaser.Types.Input.Keyboard.CursorKeys;
 		
-		// Configure the arcade physics world with stronger gravity
-		this.physics.world.gravity.y = 1000;
-		this.physics.world.setBounds(0, 0, width, height);
+		// Physics world gravity is set in main.ts now
+		// this.physics.world.gravity.y = 1000;
+
+		// Set physics world bounds
+		this.physics.world.setBounds(0, 0, worldWidth, worldHeight);
+		// Make player collide with world bounds
+		this.player.body.setCollideWorldBounds(true);
+
+		// Configure camera
+		this.cameras.main.setBounds(0, 0, worldWidth, worldHeight);
+		this.cameras.main.startFollow(this.player, true, 0.1, 0.1); // Follow player smoothly
 		
 		// Always enable mobile controls for all devices
 		this.isMobile = true;
@@ -485,7 +492,7 @@ export default class MainScene extends Phaser.Scene {
 	}
 
 	update() {
-		// Update the player with the current input state
+		// Update the player (movement logic is now primarily physics-driven in Player.ts)
 		this.player.update(
 			this.cursors,
 			this.leftButtonPressed(),
@@ -494,50 +501,19 @@ export default class MainScene extends Phaser.Scene {
 			this.dashButtonPressed()
 		);
 
-		// Implement custom parallax scrolling with the paired images
-		// Only scroll when moving to avoid constant scrolling
-		const scrollSpeed = (this.cursors.right?.isDown || this.rightButtonPressed() ? 1 :
-							(this.cursors.left?.isDown || this.leftButtonPressed() ? -1 : 0));
+		// Parallax is now handled by camera scroll and background scrollFactors
+		// No manual background update needed here
 
-		// Update background positions for parallax effect
-		this.updateParallaxBackground(scrollSpeed);
-		
 		// Update ground position info text for easy debugging/adjustment
 		if (this.groundInfoText && this.mainGround) {
-			this.groundInfoText.setText(`Ground: ${Math.round(this.mainGround.x)}, ${Math.round(this.mainGround.y)} - ${this.mainGround.width}x${this.mainGround.height}`);
+			// Display player position as well for context
+			const playerX = Math.round(this.player.x);
+			const playerY = Math.round(this.player.y);
+			this.groundInfoText.setText(`Player: ${playerX}, ${playerY}\nGround: ${Math.round(this.mainGround.x)}, ${Math.round(this.mainGround.y)} - ${this.mainGround.width}x${this.mainGround.height}`);
 		}
 	}
 
-	// Custom method to handle parallax scrolling with paired images
-	updateParallaxBackground(scrollSpeed: number) {
-		const width = this.scale.width;
-
-		// Different speeds for each layer
-		const speeds = [0.5, 1.0, 1.5, 2.0];
-
-		// Update each layer with its own speed
-		this.updateBackgroundPair(this.bg1, this.bg1Dup, speeds[0] * scrollSpeed, width);
-		this.updateBackgroundPair(this.bg2, this.bg2Dup, speeds[1] * scrollSpeed, width);
-		this.updateBackgroundPair(this.bg3, this.bg3Dup, speeds[2] * scrollSpeed, width);
-		this.updateBackgroundPair(this.bg4, this.bg4Dup, speeds[3] * scrollSpeed, width);
-	}
-
-	// Helper method to update a pair of background images
-	updateBackgroundPair(bg: Phaser.GameObjects.Image, bgDup: Phaser.GameObjects.Image, speed: number, width: number) {
-		// Move both images by the speed
-		bg.x -= speed;
-		bgDup.x -= speed;
-
-		// If the first image has moved completely off screen to the left, place it to the right of the second image
-		if (bg.x <= -width) {
-			bg.x = bgDup.x + width;
-		}
-
-		// If the second image has moved completely off screen to the left, place it to the right of the first image
-		if (bgDup.x <= -width) {
-			bgDup.x = bg.x + width;
-		}
-	}
+	// Removed updateParallaxBackground and updateBackgroundPair methods
 
 	/* END-USER-CODE */
 }

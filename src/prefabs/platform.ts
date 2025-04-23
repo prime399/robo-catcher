@@ -63,7 +63,6 @@ export default class Platform extends Phaser.GameObjects.Container { // Renamed 
         const scaledTileHeight = 16 * 1.5; // Assuming original tile height was 16
         body.setSize(this.numTiles * scaledTileWidth, scaledTileHeight);
         body.setOffset(0, 0); // Offset remains 0 relative to container
-
         // Set depth to ensure visibility
         this.setDepth(15);
         /* END-USER-CTR-CODE */
@@ -121,6 +120,7 @@ export default class Platform extends Phaser.GameObjects.Container { // Renamed 
         const scaledTileWidth = this.tileWidth * 1.5;
         const scaledTileHeight = 16 * 1.5; // Assuming original tile height was 16
         body.setSize(numTiles * scaledTileWidth, scaledTileHeight);
+        body.updateFromGameObject(); // Update body position/size based on container changes
     }
 
     // Method to get the width of the platform (returns visual width)
