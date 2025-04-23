@@ -33,8 +33,8 @@ export default class MainScene extends Phaser.Scene {
 
 		// _3
 		const _3 = this.add.tileSprite(280, 0, 576, 324, "3");
-		_3.setOrigin(0.5, 0);
 		_3.visible = false; // Hide the tileSprite background
+		_3.setOrigin(0.5, 0);
 
 		// _4
 		const _4 = this.add.tileSprite(280, 0, 576, 324, "4");
@@ -65,6 +65,10 @@ export default class MainScene extends Phaser.Scene {
 		mainPlatform.setScale(1.9); // Apply 1.5 scale to match with player visually
 		this.mainPlatform = mainPlatform as Platform;
 
+		// ground
+		const ground = this.add.rectangle(100, 445, 350, 20, 0x00ff00);
+		this.ground = ground;
+
 		this.events.emit("scene-awake");
 	}
 
@@ -81,6 +85,7 @@ export default class MainScene extends Phaser.Scene {
 	private bg4Dup!: Phaser.GameObjects.Image;
 	private player!: Player;
 	private mainPlatform!: Platform;
+	private ground!: Phaser.GameObjects.Rectangle;
 	private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
 	private leftButton!: Phaser.GameObjects.Rectangle;
 	private rightButton!: Phaser.GameObjects.Rectangle;
@@ -89,8 +94,19 @@ export default class MainScene extends Phaser.Scene {
 	private isMobile: boolean = true;
 	private mainOverlay!: Phaser.GameObjects.Image;
 	// private speed: number = 200; // Default movement speed
+	private groundInfoText!: Phaser.GameObjects.Text;
+
+	// Check if device is mobile
+	isMobileDevice(): boolean {
+		return (
+			/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+			(window.innerWidth <= 800 && window.innerHeight <= 1200)
+		);
+	}
 
 	create() {
+		// Configure for fullscreen on mobile
+		this.setupFullscreen();
 
 		// Get scene dimensions (assuming default or set elsewhere)
 		const width = this.scale.width;
@@ -167,8 +183,20 @@ export default class MainScene extends Phaser.Scene {
 			);
 		}
 
+		// Add physics to the ground object
+		if (this.ground) {
+			this.physics.add.existing(this.ground, true); // true makes it static
+			// Set the depth to ensure the ground is visible
+			this.ground.setDepth(10);
+			// Add alpha to make it semi-transparent for visual adjustment
+			this.ground.setAlpha(0.7);
+		}
+
 		// Add collider for the player and main platform
 		this.physics.add.collider(this.player, this.mainPlatform);
+		
+		// Add collider for the player and ground
+		this.physics.add.collider(this.player, this.ground);
 
 		// Set up keyboard controls
 		this.cursors = this.input.keyboard?.createCursorKeys() || {} as Phaser.Types.Input.Keyboard.CursorKeys;
@@ -186,8 +214,96 @@ export default class MainScene extends Phaser.Scene {
 		instructions.setScrollFactor(0);
 		instructions.setDepth(30); // Set a high depth for UI elements
 
+		// Add text to show ground position for debugging
+		const groundInfoText = this.add.text(16, 50, `Ground: ${this.ground.x}, ${this.ground.y} - ${this.ground.width}x${this.ground.height}`, {
+			fontSize: '14px',
+			color: '#ffffff',
+			backgroundColor: '#000000',
+			padding: { x: 10, y: 5 }
+		});
+		groundInfoText.setScrollFactor(0);
+		groundInfoText.setDepth(30);
+		this.groundInfoText = groundInfoText;
+
 		// Create mobile controls for all devices
 		this.createMobileControls();
+	}
+
+	// Set up fullscreen mode, especially for mobile
+	setupFullscreen() {
+		// Get scale manager
+		const scaleManager = this.scale;
+
+		// Lock orientation to landscape for mobile devices
+		if (this.isMobileDevice()) {
+			// Set to full screen mode for mobile by default
+			if (scaleManager.isFullscreen === false) {
+				// For mobile, go fullscreen automatically
+				this.requestFullscreen();
+			}
+
+			// Add fullscreen event listener
+			this.scale.on('enterfullscreen', () => {
+				this.adjustForFullscreen();
+			});
+
+			this.scale.on('leavefullscreen', () => {
+			});
+
+			// Add orientation change event listener
+			window.addEventListener('orientationchange', () => {
+				this.adjustForFullscreen();
+			});
+		}
+
+		// Add fullscreen toggle button for non-auto fullscreen devices
+		const fsButton = this.add.rectangle(this.scale.width - 40, 40, 50, 50, 0x000000, 0.5)
+			.setScrollFactor(0)
+			.setDepth(31)
+			.setInteractive();
+		
+		// Add fs icon
+		this.add.text(this.scale.width - 40, 40, "FS", {
+			fontSize: '20px',
+			color: '#ffffff'
+		}).setOrigin(0.5).setScrollFactor(0).setDepth(32);
+
+		// Set up click event for fullscreen toggle
+		fsButton.on('pointerdown', () => {
+			this.toggleFullscreen();
+		});
+	}
+
+	// Request fullscreen mode
+	requestFullscreen() {
+		if (!this.scale.isFullscreen) {
+			this.scale.startFullscreen();
+		}
+	}
+
+	// Toggle fullscreen mode
+	toggleFullscreen() {
+		if (this.scale.isFullscreen) {
+			this.scale.stopFullscreen();
+		} else {
+			this.scale.startFullscreen();
+		}
+	}
+
+	// Adjust game elements for fullscreen
+	adjustForFullscreen() {
+		// Resize game view if needed
+		const width = window.innerWidth;
+		const height = window.innerHeight;
+		
+		// Adjust game objects for new screen size if necessary
+		if (this.mainOverlay) {
+			this.mainOverlay.setPosition(width / 2, height / 2);
+			const overlayScaleX = width / this.mainOverlay.width;
+			const overlayScaleY = height / this.mainOverlay.height;
+			const overlayScale = Math.max(overlayScaleX, overlayScaleY); 
+			this.mainOverlay.setScale(overlayScale);
+		}
 	}
 
 	// Create mobile touch controls
@@ -274,6 +390,11 @@ export default class MainScene extends Phaser.Scene {
 
 		// Update background positions for parallax effect
 		this.updateParallaxBackground(scrollSpeed);
+		
+		// Update ground position info text for easy debugging/adjustment
+		if (this.groundInfoText) {
+			this.groundInfoText.setText(`Ground: ${Math.round(this.ground.x)}, ${Math.round(this.ground.y)} - ${this.ground.width}x${this.ground.height}`);
+		}
 	}
 
 	// Custom method to handle parallax scrolling with paired images
