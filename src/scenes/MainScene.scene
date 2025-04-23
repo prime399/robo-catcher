@@ -19,7 +19,7 @@
             "texture": {
                 "key": "1"
             },
-            "x": 300,
+            "x": 280,
             "originY": 0,
             "width": 576,
             "height": 324
@@ -31,7 +31,7 @@
             "texture": {
                 "key": "2"
             },
-            "x": 300,
+            "x": 280,
             "originY": 0,
             "width": 576,
             "height": 324
@@ -43,7 +43,7 @@
             "texture": {
                 "key": "3"
             },
-            "x": 300,
+            "x": 280,
             "originY": 0,
             "width": 576,
             "height": 324
@@ -55,7 +55,7 @@
             "texture": {
                 "key": "4"
             },
-            "x": 300,
+            "x": 280,
             "originY": 0,
             "width": 576,
             "height": 324
@@ -67,8 +67,40 @@
             "texture": {
                 "key": "main overlay"
             },
-            "x": 300,
+            "x": 280,
             "originY": -0.3
+        },
+        {
+            "prefabId": "83c8d380-8116-44a9-b2f6-2e0db8436ef4",
+            "id": "740fd850-957e-4bb8-9902-cf36cd6f330f",
+            "unlock": [
+                "x",
+                "y",
+                "scaleX",
+                "scaleY",
+                "originX",
+                "originY"
+            ],
+            "label": "player",
+            "x": 10,
+            "y": 278,
+            "scaleX": 0.7,
+            "scaleY": 0.7,
+            "originX": 0.5,
+            "originY": 0.5
+        },
+        {
+            "prefabId": "73c8d380-8116-44a9-b2f6-2e0db8436ef3",
+            "id": "a40fd850-957e-4bb8-9902-cf36cd6f330a",
+            "unlock": [
+                "x",
+                "y",
+                "numTiles"
+            ],
+            "label": "mainPlatform",
+            "numTiles": 6,
+            "x": 145,
+            "y": 273
         }
     ],
     "plainObjects": [],

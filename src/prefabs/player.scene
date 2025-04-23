@@ -1,0 +1,49 @@
+{
+    "id": "83c8d380-8116-44a9-b2f6-2e0db8436ef4",
+    "sceneType": "PREFAB",
+    "settings": {
+        "exportClass": true,
+        "autoImport": true,
+        "preloadMethodName": "preload",
+        "preloadPackFiles": [],
+        "createMethodName": "create",
+        "compilerOutputLanguage": "TYPE_SCRIPT",
+        "borderWidth": 0,
+        "borderHeight": 0
+    },
+    "displayList": [
+        {
+            "type": "Sprite",
+            "id": "ed5d3330-55a2-4f84-a9f4-12d71de1a297",
+            "label": "robot",
+            "components": [],
+            "texture": {
+                "key": "robo2run-Sheet[32height32wide]",
+                "frame": 0
+            },
+            "x": 0,
+            "y": 0,
+            "scaleX": 2,
+            "scaleY": 2
+        }
+    ],
+    "plainObjects": [],
+    "meta": {
+        "app": "Phaser Editor 2D - Scene Editor",
+        "url": "https://phasereditor2d.com",
+        "contentType": "phasereditor2d.core.scene.SceneContentType",
+        "version": 3
+    },
+    "prefabProperties": [
+        {
+            "name": "speed",
+            "label": "Movement Speed",
+            "tooltip": "Speed of the player movement",
+            "defValue": 200,
+            "customDefinition": false,
+            "type": {
+                "id": "number"
+            }
+        }
+    ]
+}

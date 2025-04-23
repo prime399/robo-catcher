@@ -1,83 +1,127 @@
 {
-    "id": "9c9c9b18-dccd-4b57-8273-df33a938cc6b",
-    "sceneType": "SCENE",
+    "id": "73c8d380-8116-44a9-b2f6-2e0db8436ef3",
+    "sceneType": "PREFAB",
     "settings": {
         "exportClass": true,
         "autoImport": true,
+        "preloadMethodName": "preload",
         "preloadPackFiles": [],
-        "createMethodName": "editorCreate",
-        "sceneKey": "platform",
+        "createMethodName": "create",
         "compilerOutputLanguage": "TYPE_SCRIPT",
-        "borderWidth": 1280,
-        "borderHeight": 720
+        "borderWidth": 0,
+        "borderHeight": 0
     },
     "displayList": [
         {
-            "type": "ArcadeImage",
-            "id": "28365298-02a4-4f21-9846-69f40c783394",
-            "label": "arcadeimage_1",
-            "texture": {
-                "key": "world_7_tileset",
-                "frame": 722
-            },
-            "x": 467,
-            "y": 267,
-            "originX": 0,
-            "originY": 0,
-            "body.width": 16,
-            "body.height": 16
-        },
-        {
-            "type": "ArcadeImage",
-            "id": "de6d6d18-06d5-4ca9-ac62-6e4c791925f1",
-            "label": "arcadeimage_2",
-            "texture": {
-                "key": "world_7_tileset",
-                "frame": 723
-            },
-            "x": 483,
-            "y": 267,
-            "originX": 0,
-            "originY": 0,
-            "body.width": 16,
-            "body.height": 16
-        },
-        {
-            "type": "ArcadeImage",
-            "id": "66d7a918-e429-44ce-b54d-7b4ac94b0627",
-            "label": "arcadeimage_3",
-            "texture": {
-                "key": "world_7_tileset",
-                "frame": 723
-            },
-            "x": 499,
-            "y": 267,
-            "originX": 0,
-            "originY": 0,
-            "body.width": 16,
-            "body.height": 16
-        },
-        {
-            "type": "ArcadeImage",
-            "id": "93a1325b-76bb-4a2b-a628-eefadcab1216",
-            "label": "arcadeimage_4",
-            "texture": {
-                "key": "world_7_tileset",
-                "frame": 724
-            },
-            "x": 515,
-            "y": 267,
-            "originX": 0,
-            "originY": 0,
-            "body.width": 16,
-            "body.height": 16
+            "type": "Container",
+            "id": "ed5d3330-55a2-4f84-a9f4-12d71de1a296",
+            "label": "container_1",
+            "components": [],
+            "list": [
+                {
+                    "type": "Image",
+                    "id": "722a8f30-1234-4567-8901-abcdef123456",
+                    "label": "leftEdge",
+                    "components": [],
+                    "texture": {
+                        "key": "world_7_tileset",
+                        "frame": 722
+                    },
+                    "x": 0,
+                    "y": 0,
+                    "originX": 0,
+                    "originY": 0
+                },
+                {
+                    "type": "Image",
+                    "id": "723a8f30-1234-4567-8901-abcdef123456",
+                    "label": "middle1",
+                    "components": [],
+                    "texture": {
+                        "key": "world_7_tileset",
+                        "frame": 723
+                    },
+                    "x": 16,
+                    "y": 0,
+                    "originX": 0,
+                    "originY": 0
+                },
+                {
+                    "type": "Image",
+                    "id": "723b8f30-1234-4567-8901-abcdef123456",
+                    "label": "middle2",
+                    "components": [],
+                    "texture": {
+                        "key": "world_7_tileset",
+                        "frame": 723
+                    },
+                    "x": 32,
+                    "y": 0,
+                    "originX": 0,
+                    "originY": 0
+                },
+                {
+                    "type": "Image",
+                    "id": "723c8f30-1234-4567-8901-abcdef123456",
+                    "label": "middle3",
+                    "components": [],
+                    "texture": {
+                        "key": "world_7_tileset",
+                        "frame": 723
+                    },
+                    "x": 48,
+                    "y": 0,
+                    "originX": 0,
+                    "originY": 0
+                },
+                {
+                    "type": "Image",
+                    "id": "723d8f30-1234-4567-8901-abcdef123456",
+                    "label": "middle4",
+                    "components": [],
+                    "texture": {
+                        "key": "world_7_tileset",
+                        "frame": 723
+                    },
+                    "x": 64,
+                    "y": 0,
+                    "originX": 0,
+                    "originY": 0
+                },
+                {
+                    "type": "Image",
+                    "id": "724a8f30-1234-4567-8901-abcdef123456",
+                    "label": "rightEdge",
+                    "components": [],
+                    "texture": {
+                        "key": "world_7_tileset",
+                        "frame": 724
+                    },
+                    "x": 80,
+                    "y": 0,
+                    "originX": 0,
+                    "originY": 0
+                }
+            ]
         }
     ],
     "plainObjects": [],
     "meta": {
-        "app": "Phaser Editor - Scene Editor",
-        "url": "https://phaser.io/editor",
+        "app": "Phaser Editor 2D - Scene Editor",
+        "url": "https://phasereditor2d.com",
         "contentType": "phasereditor2d.core.scene.SceneContentType",
-        "version": 5
-    }
+        "version": 3
+    },
+    "prefabProperties": [
+        {
+            "name": "numTiles",
+            "label": "Number of Tiles",
+            "tooltip": "Number of tiles in the platform",
+            "defValue": 6,
+            "customDefinition": false,
+            "type": {
+                "id": "number"
+            }
+        }
+    ]
 }
