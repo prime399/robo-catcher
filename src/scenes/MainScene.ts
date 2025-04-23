@@ -2,11 +2,9 @@
 
 /* START OF COMPILED CODE */
 
-import playerPrefab from "../prefabs/player";
-import platformPrefab from "../prefabs/platform";
-/* START-USER-IMPORTS */
-import Platform from "../prefabs/platform";
 import Player from "../prefabs/player";
+import Platform from "../prefabs/platform";
+/* START-USER-IMPORTS */
 /* END-USER-IMPORTS */
 
 export default class MainScene extends Phaser.Scene {
@@ -49,7 +47,7 @@ export default class MainScene extends Phaser.Scene {
 		this.mainOverlay = main_overlay;
 
 		// player
-		const playerInstance = new playerPrefab(this, 10, 272);
+		const playerInstance = new Player(this, 10, 272);
 		this.add.existing(playerInstance);
 		playerInstance.scaleX = 1.5;
 		playerInstance.scaleY = 1.5;
@@ -57,7 +55,7 @@ export default class MainScene extends Phaser.Scene {
 		this.player = playerInstance as Player;
 
 		// mainPlatform
-		const mainPlatform = new platformPrefab(this, 350, 390);
+		const mainPlatform = new Platform(this, 350, 390);
 		this.add.existing(mainPlatform);
 
 		// mainPlatform (prefab fields)
@@ -65,9 +63,8 @@ export default class MainScene extends Phaser.Scene {
 		mainPlatform.setScale(1.9); // Apply 1.5 scale to match with player visually
 		this.mainPlatform = mainPlatform as Platform;
 
-		// ground
-		const ground = this.add.rectangle(100, 445, 350, 20, 0x00ff00);
-		this.ground = ground;
+		// We're now creating ground in setupWorldObjects instead
+		// No ground creation here
 
 		this.events.emit("scene-awake");
 	}
@@ -85,7 +82,6 @@ export default class MainScene extends Phaser.Scene {
 	private bg4Dup!: Phaser.GameObjects.Image;
 	private player!: Player;
 	private mainPlatform!: Platform;
-	private ground!: Phaser.GameObjects.Rectangle;
 	private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
 	private leftButton!: Phaser.GameObjects.Rectangle;
 	private rightButton!: Phaser.GameObjects.Rectangle;
@@ -93,8 +89,9 @@ export default class MainScene extends Phaser.Scene {
 	private dashButton!: Phaser.GameObjects.Rectangle;
 	private isMobile: boolean = true;
 	private mainOverlay!: Phaser.GameObjects.Image;
-	// private speed: number = 200; // Default movement speed
 	private groundInfoText!: Phaser.GameObjects.Text;
+	private worldObjects: any[] = [];
+	private mainGround!: Phaser.GameObjects.Rectangle;
 
 	// Check if device is mobile
 	isMobileDevice(): boolean {
@@ -142,15 +139,8 @@ export default class MainScene extends Phaser.Scene {
 		// Call editorCreate to create the player and platforms from the scene file
 		this.editorCreate();
 
-		// Make sure the main overlay is properly positioned and scaled
-		// This ensures proper scaling even if the scene file changes
-		this.mainOverlay.setPosition(width / 2, height / 2);
-		this.mainOverlay.setOrigin(0.5, 0.5);
-		const overlayScaleX = width / this.mainOverlay.width;
-		const overlayScaleY = height / this.mainOverlay.height;
-		const overlayScale = Math.max(overlayScaleX, overlayScaleY); 
-		this.mainOverlay.setScale(overlayScale);
-		this.mainOverlay.setDepth(1);
+		// Create a physics group for all static world objects
+		this.worldObjects = [];
 
 		// Add physics to the player if not already added
 		if (!this.player.body) {
@@ -183,24 +173,39 @@ export default class MainScene extends Phaser.Scene {
 			);
 		}
 
-		// Add physics to the ground object
-		if (this.ground) {
-			this.physics.add.existing(this.ground, true); // true makes it static
-			// Set the depth to ensure the ground is visible
-			this.ground.setDepth(10);
-			// Add alpha to make it semi-transparent for visual adjustment
-			this.ground.setAlpha(0.7);
-		}
+		// Set up world borders and other collision objects AFTER physics have been added to player and platforms
+		this.setupWorldObjects();
 
-		// Add collider for the player and main platform
-		this.physics.add.collider(this.player, this.mainPlatform);
-		
-		// Add collider for the player and ground
-		this.physics.add.collider(this.player, this.ground);
+		// Make sure the main overlay is properly positioned and scaled
+		// This ensures proper scaling even if the scene file changes
+		this.mainOverlay.setPosition(width / 2, height / 2);
+		this.mainOverlay.setOrigin(0.5, 0.5);
+		const overlayScaleX = width / this.mainOverlay.width;
+		const overlayScaleY = height / this.mainOverlay.height;
+		const overlayScale = Math.max(overlayScaleX, overlayScaleY); 
+		this.mainOverlay.setScale(overlayScale);
+		this.mainOverlay.setDepth(1);
+
+		// Add directly a simple collider without callback parameters to avoid TypeScript warnings
+		this.physics.add.collider(this.player, this.worldObjects);
+
+		// Update debug info with a proper display
+		this.groundInfoText = this.add.text(16, 50, 'Ground info will update...', {
+			fontSize: '14px',
+			color: '#ffffff',
+			backgroundColor: '#000000',
+			padding: { x: 10, y: 5 }
+		});
+		this.groundInfoText.setScrollFactor(0);
+		this.groundInfoText.setDepth(30);
 
 		// Set up keyboard controls
 		this.cursors = this.input.keyboard?.createCursorKeys() || {} as Phaser.Types.Input.Keyboard.CursorKeys;
-
+		
+		// Configure the arcade physics world with stronger gravity
+		this.physics.world.gravity.y = 1000;
+		this.physics.world.setBounds(0, 0, width, height);
+		
 		// Always enable mobile controls for all devices
 		this.isMobile = true;
 
@@ -214,19 +219,118 @@ export default class MainScene extends Phaser.Scene {
 		instructions.setScrollFactor(0);
 		instructions.setDepth(30); // Set a high depth for UI elements
 
-		// Add text to show ground position for debugging
-		const groundInfoText = this.add.text(16, 50, `Ground: ${this.ground.x}, ${this.ground.y} - ${this.ground.width}x${this.ground.height}`, {
-			fontSize: '14px',
-			color: '#ffffff',
-			backgroundColor: '#000000',
-			padding: { x: 10, y: 5 }
-		});
-		groundInfoText.setScrollFactor(0);
-		groundInfoText.setDepth(30);
-		this.groundInfoText = groundInfoText;
-
 		// Create mobile controls for all devices
 		this.createMobileControls();
+	}
+
+	// Set up the world objects including ground, borders, and obstacles
+	setupWorldObjects() {
+		const width = this.scale.width;
+		const height = this.scale.height;
+
+		// Add borders to prevent player from leaving the screen
+		this.addBorder(0, height/2, 20, height); // Left border
+		this.addBorder(width, height/2, 20, height); // Right border
+		
+		// Create main ground explicitly with the exact same properties as the original one
+		// This ensures it's properly set up in our new system
+		const mainGround = this.addGround(0, 430, 300, 20, 0x00ff00);
+		// Store it for reference if needed
+		this.mainGround = mainGround;
+		
+		// No longer need to handle old ground
+		
+		// Add mainPlatform to the world objects group if it exists
+		if (this.mainPlatform && this.mainPlatform.body) {
+			// The mainPlatform already has physics, so we just need to add it to our group
+			this.worldObjects.push(this.mainPlatform);
+		}
+		
+		// Add additional platforms (adjust positions as needed)
+		this.addGround(200, 350, 250, 20); // Platform 1
+		this.addGround(500, 250, 200, 20); // Platform 2
+		
+		// Add some obstacle boxes
+		this.addBox(300, 300, 50, 50);
+		this.addBox(450, 200, 60, 60);
+		this.addBox(600, 400, 40, 80);
+	}
+
+	// Helper method to add a ground/platform with robust physics
+	addGround(x: number, y: number, width: number, height: number, color: number = 0x00ff00) {
+		// Create a rectangle representing the ground
+		const ground = this.add.rectangle(x, y, width, height, color).setOrigin(0, 0);
+		
+		// Add physics to the ground BEFORE adding to the group
+		this.physics.add.existing(ground, true); // true makes it static
+		
+		// Get the physics body to adjust properties
+		const body = ground.body as Phaser.Physics.Arcade.StaticBody;
+		
+		// Make sure the physics body matches the visual size
+		body.setSize(width, height);
+		
+		// Enable collision on all sides with immovable flag
+		body.checkCollision.down = true;
+		body.checkCollision.up = true;
+		body.checkCollision.left = true;
+		body.checkCollision.right = true;
+		body.immovable = true;
+		
+		// Add it to the world objects group 
+		this.worldObjects.push(ground);
+		
+		// Make it semi-transparent for better visualization
+		ground.setAlpha(0.7);
+		
+		// Store the dimensions for debugging
+		ground.setData('width', width);
+		ground.setData('height', height);
+		
+		// Set a high depth to ensure visibility
+		ground.setDepth(10);
+		
+		return ground;
+	}
+	
+	// Helper method to add a border
+	addBorder(x: number, y: number, width: number, height: number, color: number = 0xff0000) {
+		// Create a rectangle representing the border
+		const border = this.add.rectangle(x, y, width, height, color).setOrigin(0, 0);
+		
+		// Add physics to the border BEFORE adding to the group
+		this.physics.add.existing(border, true);
+		
+		// Add it to the world objects group
+		this.worldObjects.push(border);
+		
+		// Make it semi-transparent for better visualization
+		border.setAlpha(0.5);
+		
+		// Set a high depth to ensure visibility
+		border.setDepth(10);
+		
+		return border;
+	}
+	
+	// Helper method to add a box obstacle
+	addBox(x: number, y: number, width: number, height: number, color: number = 0x0000ff) {
+		// Create a rectangle representing the box
+		const box = this.add.rectangle(x, y, width, height, color).setOrigin(0, 0);
+		
+		// Add physics to the box BEFORE adding to the group
+		this.physics.add.existing(box, true);
+		
+		// Add it to the world objects group
+		this.worldObjects.push(box);
+		
+		// Make it semi-transparent for better visualization
+		box.setAlpha(0.7);
+		
+		// Set a high depth to ensure visibility
+		box.setDepth(10);
+		
+		return box;
 	}
 
 	// Set up fullscreen mode, especially for mobile
@@ -392,8 +496,8 @@ export default class MainScene extends Phaser.Scene {
 		this.updateParallaxBackground(scrollSpeed);
 		
 		// Update ground position info text for easy debugging/adjustment
-		if (this.groundInfoText) {
-			this.groundInfoText.setText(`Ground: ${Math.round(this.ground.x)}, ${Math.round(this.ground.y)} - ${this.ground.width}x${this.ground.height}`);
+		if (this.groundInfoText && this.mainGround) {
+			this.groundInfoText.setText(`Ground: ${Math.round(this.mainGround.x)}, ${Math.round(this.mainGround.y)} - ${this.mainGround.width}x${this.mainGround.height}`);
 		}
 	}
 
