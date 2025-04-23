@@ -32,10 +32,15 @@
                 "key": "FufuSuperDino"
             },
             {
+                "url": "assets/Tileset/main overlay.png",
+                "type": "image",
+                "key": "main overlay"
+            },
+            {
                 "url": "assets/robot2/robo2masked/robo2jump-Sheet[48height32wide].png",
                 "frameConfig": {
                     "frameWidth": 32,
-                    "frameHeight": 50,
+                    "frameHeight": 48,
                     "startFrame": 0,
                     "endFrame": -1,
                     "spacing": 0,
@@ -43,6 +48,12 @@
                 },
                 "type": "spritesheet",
                 "key": "robo2jump-Sheet[48height32wide]"
+            },
+            {
+                "atlasURL": "assets/robot2/palyerrobo2masked/robo2masked.json",
+                "textureURL": "assets/robot2/palyerrobo2masked/robo2masked.png",
+                "type": "atlas",
+                "key": "robo2masked"
             },
             {
                 "url": "assets/robot2/robo2masked/robo2run-Sheet[32height32wide].png",
@@ -69,6 +80,19 @@
                 },
                 "type": "spritesheet",
                 "key": "robot2dash-Sheet[32height32wide]"
+            },
+            {
+                "url": "assets/Tileset/world_7_tileset.png",
+                "frameConfig": {
+                    "frameWidth": 16,
+                    "frameHeight": 16,
+                    "startFrame": 0,
+                    "endFrame": -1,
+                    "spacing": 0,
+                    "margin": 0
+                },
+                "type": "spritesheet",
+                "key": "world_7_tileset"
             }
         ]
     },

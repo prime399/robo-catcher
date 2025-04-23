@@ -1,0 +1,83 @@
+{
+    "id": "9c9c9b18-dccd-4b57-8273-df33a938cc6b",
+    "sceneType": "SCENE",
+    "settings": {
+        "exportClass": true,
+        "autoImport": true,
+        "preloadPackFiles": [],
+        "createMethodName": "editorCreate",
+        "sceneKey": "platform",
+        "compilerOutputLanguage": "TYPE_SCRIPT",
+        "borderWidth": 1280,
+        "borderHeight": 720
+    },
+    "displayList": [
+        {
+            "type": "ArcadeImage",
+            "id": "28365298-02a4-4f21-9846-69f40c783394",
+            "label": "arcadeimage_1",
+            "texture": {
+                "key": "world_7_tileset",
+                "frame": 722
+            },
+            "x": 467,
+            "y": 267,
+            "originX": 0,
+            "originY": 0,
+            "body.width": 16,
+            "body.height": 16
+        },
+        {
+            "type": "ArcadeImage",
+            "id": "de6d6d18-06d5-4ca9-ac62-6e4c791925f1",
+            "label": "arcadeimage_2",
+            "texture": {
+                "key": "world_7_tileset",
+                "frame": 723
+            },
+            "x": 483,
+            "y": 267,
+            "originX": 0,
+            "originY": 0,
+            "body.width": 16,
+            "body.height": 16
+        },
+        {
+            "type": "ArcadeImage",
+            "id": "66d7a918-e429-44ce-b54d-7b4ac94b0627",
+            "label": "arcadeimage_3",
+            "texture": {
+                "key": "world_7_tileset",
+                "frame": 723
+            },
+            "x": 499,
+            "y": 267,
+            "originX": 0,
+            "originY": 0,
+            "body.width": 16,
+            "body.height": 16
+        },
+        {
+            "type": "ArcadeImage",
+            "id": "93a1325b-76bb-4a2b-a628-eefadcab1216",
+            "label": "arcadeimage_4",
+            "texture": {
+                "key": "world_7_tileset",
+                "frame": 724
+            },
+            "x": 515,
+            "y": 267,
+            "originX": 0,
+            "originY": 0,
+            "body.width": 16,
+            "body.height": 16
+        }
+    ],
+    "plainObjects": [],
+    "meta": {
+        "app": "Phaser Editor - Scene Editor",
+        "url": "https://phaser.io/editor",
+        "contentType": "phasereditor2d.core.scene.SceneContentType",
+        "version": 5
+    }
+}

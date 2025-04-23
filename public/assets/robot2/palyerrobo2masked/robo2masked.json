@@ -1,0 +1,183 @@
+{
+  "frames": {
+    "robot2attack1-Sheet[32height64wide].png": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 1408,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 1408,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 1408,
+        "h": 32
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "robot2damage-Sheet[32height64wide].png": {
+      "frame": {
+        "x": 1408,
+        "y": 0,
+        "w": 512,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 512,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 512,
+        "h": 32
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "robo2jumpattack-Sheet[48height48wide].png": {
+      "frame": {
+        "x": 0,
+        "y": 32,
+        "w": 336,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 336,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 336,
+        "h": 48
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "robo2run-Sheet[32height32wide].png": {
+      "frame": {
+        "x": 336,
+        "y": 32,
+        "w": 256,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 256,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 32
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "robo2jump-Sheet[48height32wide].png": {
+      "frame": {
+        "x": 592,
+        "y": 32,
+        "w": 224,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 224,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 224,
+        "h": 48
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "robot2dash-Sheet[32height32wide].png": {
+      "frame": {
+        "x": 336,
+        "y": 64,
+        "w": 224,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 224,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 224,
+        "h": 32
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "robot2damage-Sheet[32height32wide].png": {
+      "frame": {
+        "x": 0,
+        "y": 80,
+        "w": 192,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 192,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 32
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    }
+  },
+  "meta": {
+    "app": "http://free-tex-packer.com",
+    "version": "0.6.7",
+    "image": "robo2masked.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 1920,
+      "h": 112
+    },
+    "scale": 1
+  }
+}
