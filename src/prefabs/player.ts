@@ -56,6 +56,7 @@ export default class Player extends Phaser.GameObjects.Sprite {
     
     // Keep track of current animation to avoid unnecessary changes
     private currentAnimation: string = "robot idle";
+    private isJumping: boolean = false;
     
     // Update method to handle player movement
     update(cursors: Phaser.Types.Input.Keyboard.CursorKeys, leftButtonPressed: boolean = false, rightButtonPressed: boolean = false, jumpButtonPressed: boolean = false, dashButtonPressed: boolean = false): void {
@@ -63,6 +64,12 @@ export default class Player extends Phaser.GameObjects.Sprite {
         // Declare variables ONCE
         let targetAnimKey: string = "robot idle"; // Default to idle
         const onGround = this.body.blocked.down;
+        const verticalVelocity = this.body.velocity.y;
+
+        // Reset jumping state when landed
+        if (onGround) {
+            this.isJumping = false;
+        }
 
         // Horizontal Movement & Animation
         if (cursors.left?.isDown || leftButtonPressed) {
@@ -82,16 +89,16 @@ export default class Player extends Phaser.GameObjects.Sprite {
             this.body.setVelocityX(0);
             if (onGround) {
                 targetAnimKey = "robot idle";
-            } else {
-                 // If not moving horizontally AND not on ground, default to jump/fall anim
-                 targetAnimKey = "robot jumping";
             }
         }
 
         // Jump Logic
         if ((cursors.up?.isDown || jumpButtonPressed) && onGround) {
             this.body.setVelocityY(-this.jumpPower);
+            this.isJumping = true;
             targetAnimKey = "robot jumping"; // Set jump anim immediately
+            // Play the sound if you have one
+            // this.scene.sound.play('jump');
         }
 
         // Dash Logic & Animation (Overrides other ground animations)
@@ -99,10 +106,16 @@ export default class Player extends Phaser.GameObjects.Sprite {
              targetAnimKey = "robot dash";
         }
 
-        // Airborne Animation Check (redundant if handled above, but safe)
+        // Airborne Animation Logic - more sophisticated
         if (!onGround && targetAnimKey !== "robot dash") {
-            // Ensure jump anim is set if airborne, unless dashing
-            targetAnimKey = "robot jumping";
+            // If we're rising and in jump state, use jump animation
+            if (verticalVelocity < -50 && this.isJumping) {
+                targetAnimKey = "robot jumping";
+            } 
+            // If we're falling or the jump animation completed, use falling animation
+            else if (verticalVelocity > 50 || !this.isJumping) {
+                targetAnimKey = "robot falling";
+            }
         }
 
         // Only play a new animation if it's different from our tracked current animation
@@ -113,9 +126,26 @@ export default class Player extends Phaser.GameObjects.Sprite {
             // Play the new animation and update our tracking variable
             this.play(targetAnimKey, true);
             this.currentAnimation = targetAnimKey;
+            
+            // Set the animation to play once if it's the jumping animation
+            if (targetAnimKey === "robot jumping") {
+                this.on('animationcomplete', this.onJumpAnimComplete, this);
+            }
         }
 
         // Removed manual bounds checking - Handled by physics world bounds now
+    }
+    
+    // Handle jump animation completion
+    private onJumpAnimComplete() {
+        // Remove this listener to avoid multiple calls
+        this.off('animationcomplete', this.onJumpAnimComplete, this);
+        
+        // If we're still in the air, switch to falling animation
+        if (!this.body.blocked.down) {
+            this.play("robot falling", true);
+            this.currentAnimation = "robot falling";
+        }
     }
 
     /* END-USER-CODE */

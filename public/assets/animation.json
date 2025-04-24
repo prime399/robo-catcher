@@ -59,100 +59,6 @@
             "randomFrame": false
         },
         {
-            "key": "robot jumping",
-            "type": "frame",
-            "frames": [
-                {
-                    "key": "rb2maskedall",
-                    "frame": 0,
-                    "duration": 0,
-                    "keyframe": false
-                },
-                {
-                    "key": "rb2maskedall",
-                    "frame": 1,
-                    "duration": 0,
-                    "keyframe": false
-                },
-                {
-                    "key": "rb2maskedall",
-                    "frame": 2,
-                    "duration": 0,
-                    "keyframe": false
-                },
-                {
-                    "key": "rb2maskedall",
-                    "frame": 3,
-                    "duration": 0,
-                    "keyframe": false
-                },
-                {
-                    "key": "rb2maskedall",
-                    "frame": 4,
-                    "duration": 0,
-                    "keyframe": false
-                },
-                {
-                    "key": "rb2maskedall",
-                    "frame": 5,
-                    "duration": 0,
-                    "keyframe": false
-                },
-                {
-                    "key": "rb2maskedall",
-                    "frame": 6,
-                    "duration": 0,
-                    "keyframe": false
-                },
-                {
-                    "key": "rb2maskedall",
-                    "frame": 6,
-                    "duration": 0,
-                    "keyframe": false
-                },
-                {
-                    "key": "rb2maskedall",
-                    "frame": 5,
-                    "duration": 0,
-                    "keyframe": false
-                },
-                {
-                    "key": "rb2maskedall",
-                    "frame": 4,
-                    "duration": 0,
-                    "keyframe": false
-                },
-                {
-                    "key": "rb2maskedall",
-                    "frame": 3,
-                    "duration": 0,
-                    "keyframe": false
-                },
-                {
-                    "key": "rb2maskedall",
-                    "frame": 2,
-                    "duration": 0,
-                    "keyframe": false
-                },
-                {
-                    "key": "rb2maskedall",
-                    "frame": 1,
-                    "duration": 0,
-                    "keyframe": false
-                },
-                {
-                    "key": "rb2maskedall",
-                    "frame": 0,
-                    "duration": 0,
-                    "keyframe": false
-                }
-            ],
-            "frameRate": 10,
-            "skipMissedFrames": true,
-            "repeat": -1,
-            "randomFrame": false
-        },
-        {
             "key": "robot dash",
             "type": "frame",
             "frames": [
@@ -216,6 +122,58 @@
                 }
             ],
             "frameRate": 24,
+            "skipMissedFrames": true,
+            "repeat": -1,
+            "randomFrame": false
+        },
+        {
+            "key": "robot jumping",
+            "type": "frame",
+            "frames": [
+                {
+                    "key": "robo2jump-Sheet[48height32wide]",
+                    "frame": 0,
+                    "duration": 0,
+                    "keyframe": false
+                },
+                {
+                    "key": "robo2jump-Sheet[48height32wide]",
+                    "frame": 1,
+                    "duration": 0,
+                    "keyframe": false
+                },
+                {
+                    "key": "robo2jump-Sheet[48height32wide]",
+                    "frame": 2,
+                    "duration": 0,
+                    "keyframe": false
+                },
+                {
+                    "key": "robo2jump-Sheet[48height32wide]",
+                    "frame": 3,
+                    "duration": 0,
+                    "keyframe": false
+                },
+                {
+                    "key": "robo2jump-Sheet[48height32wide]",
+                    "frame": 4,
+                    "duration": 0,
+                    "keyframe": false
+                },
+                {
+                    "key": "robo2jump-Sheet[48height32wide]",
+                    "frame": 5,
+                    "duration": 0,
+                    "keyframe": false
+                },
+                {
+                    "key": "robo2jump-Sheet[48height32wide]",
+                    "frame": 6,
+                    "duration": 0,
+                    "keyframe": false
+                }
+            ],
+            "frameRate": 6,
             "skipMissedFrames": true,
             "repeat": -1,
             "randomFrame": false
