@@ -55,12 +55,12 @@ export default class MainScene extends Phaser.Scene {
 		this.player = playerInstance as Player;
 
 		// mainPlatform
-		const mainPlatform = new Platform(this, 350, 390);
+		const mainPlatform = new Platform(this, 340, 398);
 		this.add.existing(mainPlatform);
 
 		// mainPlatform (prefab fields)
 		mainPlatform.numTiles = 6;
-		// Removed setScale(1.9) - Scaling is handled internally by the prefab now
+		mainPlatform.setScale(1.9);
 		this.mainPlatform = mainPlatform as Platform;
 
 		// We're now creating ground in setupWorldObjects instead
@@ -221,6 +221,14 @@ export default class MainScene extends Phaser.Scene {
 
 		// Create mobile controls for all devices
 		this.createMobileControls();
+		
+		// Immediate call to adjust everything based on current dimensions
+		this.adjustForFullscreen();
+		
+		// Add a small delay to handle any post-initialization size changes
+		this.time.delayedCall(300, () => {
+			this.adjustForFullscreen();
+		});
 	}
 
 	// Set up the world objects including ground, borders, and obstacles
@@ -235,7 +243,7 @@ export default class MainScene extends Phaser.Scene {
 		
 		// Create main ground explicitly with the exact same properties as the original one
 		// This ensures it's properly set up in our new system
-		const mainGround = this.addGround(0, 440, 300, 20, 0x00ff00);
+		const mainGround = this.addGround(0, 440, 280, 20, 0x00ff00);
 		// Store it for reference if needed
 		this.mainGround = mainGround;
 		
@@ -248,11 +256,11 @@ export default class MainScene extends Phaser.Scene {
 		}
 		
 		// Add additional platforms (adjust positions as needed)
-		this.addGround(200, 350, 250, 20); // Platform 1
-		this.addGround(500, 250, 200, 20); // Platform 2
+		// this.addGround(200, 350, 250, 20); // Platform 1
+		// this.addGround(500, 250, 200, 20); // Platform 2
 		
 		// Add some obstacle boxes
-		this.addBox(300, 300, 50, 50);
+		// this.addBox(300, 300, 50, 50);
 		this.addBox(450, 200, 60, 60);
 		this.addBox(600, 400, 40, 80);
 	}
@@ -347,56 +355,129 @@ export default class MainScene extends Phaser.Scene {
 		return box;
 	}
 
+	// Adjust game elements for fullscreen - simplified to only reposition UI elements
+	adjustForFullscreen() {
+		// Get the actual canvas dimensions
+		const canvas = this.sys.game.canvas;
+		const width = canvas.width;
+		const height = canvas.height;
+		
+		// Keep camera viewport updated
+		this.cameras.main.setViewport(0, 0, width, height);
+		
+		// Just reposition mobile controls if they exist
+		if (this.leftButton && this.rightButton && this.jumpButton && this.dashButton) {
+			const buttonSize = 80;
+			const controlsY = height - buttonSize/2 - 10; // 10px from bottom
+			
+			// Update button positions
+			this.leftButton.setPosition(buttonSize/2 + 10, controlsY);
+			this.rightButton.setPosition(buttonSize*1.75 + 10, controlsY);
+			this.jumpButton.setPosition(width - buttonSize*1.75 - 10, controlsY);
+			this.dashButton.setPosition(width - buttonSize/2 - 10, controlsY);
+			
+			// Update button labels
+			const labels = this.children.list.filter(child => 
+				child instanceof Phaser.GameObjects.Text && 
+				child.scrollFactorX === 0 && 
+				child.depth === 31
+			) as Phaser.GameObjects.Text[];
+			
+			if (labels.length >= 4) {
+				labels[0]?.setPosition(buttonSize/2 + 10, controlsY);
+				labels[1]?.setPosition(buttonSize*1.75 + 10, controlsY);
+				labels[2]?.setPosition(width - buttonSize*1.75 - 10, controlsY);
+				labels[3]?.setPosition(width - buttonSize/2 - 10, controlsY);
+			}
+			
+			// Update control background position only (not size)
+			const controlBg = this.children.getByName('controlsBg') as Phaser.GameObjects.Rectangle;
+			if (controlBg) {
+				controlBg.setPosition(width/2, controlsY);
+			}
+		}
+		
+		// Update the fullscreen button position
+		const fsButton = this.children.getByName('fsButton') as Phaser.GameObjects.Rectangle;
+		const fsText = this.children.getByName('fsText') as Phaser.GameObjects.Text;
+		
+		if (fsButton && fsText) {
+			fsButton.setPosition(width - 40, 40);
+			fsText.setPosition(width - 40, 40);
+		}
+		
+		// Update instruction text position if it exists
+		const instructions = this.children.list.find(child => 
+			child instanceof Phaser.GameObjects.Text && 
+			child.scrollFactorX === 0 && 
+			child.y === 16
+		) as Phaser.GameObjects.Text;
+		
+		if (instructions) {
+			instructions.setPosition(16, 16);
+		}
+		
+		// Update debug info position
+		if (this.groundInfoText) {
+			this.groundInfoText.setPosition(16, 50);
+		}
+	}
+
 	// Set up fullscreen mode, especially for mobile
 	setupFullscreen() {
 		// Get scale manager
 		const scaleManager = this.scale;
+		
+		// Do NOT use RESIZE scale mode which causes automatic scaling
+		// Instead, use FIT mode which maintains aspect ratio without scaling content
+		scaleManager.scaleMode = Phaser.Scale.FIT;
+		
+		// Align canvas in parent
+		scaleManager.autoCenter = Phaser.Scale.CENTER_BOTH;
 
-		// Lock orientation to landscape for mobile devices
-		if (this.isMobileDevice()) {
-			// Set to full screen mode for mobile by default
-			if (scaleManager.isFullscreen === false) {
-				// For mobile, go fullscreen automatically
-				this.requestFullscreen();
-			}
+		// Add fullscreen event listeners for all devices
+		this.scale.on('enterfullscreen', () => {
+			// Only reposition UI elements, don't resize anything
+			setTimeout(() => this.adjustForFullscreen(), 100);
+		});
 
-			// Add fullscreen event listener
-			this.scale.on('enterfullscreen', () => {
-				this.adjustForFullscreen();
-			});
+		this.scale.on('leavefullscreen', () => {
+			setTimeout(() => this.adjustForFullscreen(), 100);
+		});
 
-			this.scale.on('leavefullscreen', () => {
-			});
+		// Add resize event listener with debounce
+		let resizeTimeout: any;
+		window.addEventListener('resize', () => {
+			clearTimeout(resizeTimeout);
+			resizeTimeout = setTimeout(() => this.adjustForFullscreen(), 100);
+		});
 
-			// Add orientation change event listener
-			window.addEventListener('orientationchange', () => {
-				this.adjustForFullscreen();
-			});
-		}
+		// Add orientation change event listener for all devices
+		window.addEventListener('orientationchange', () => {
+			setTimeout(() => this.adjustForFullscreen(), 200);
+		});
 
-		// Add fullscreen toggle button for non-auto fullscreen devices
+		// Add fullscreen toggle button
 		const fsButton = this.add.rectangle(this.scale.width - 40, 40, 50, 50, 0x000000, 0.5)
 			.setScrollFactor(0)
 			.setDepth(31)
-			.setInteractive();
+			.setInteractive()
+			.setName('fsButton');
 		
-		// Add fs icon
+		// Add fs icon - don't store in a const since we don't need the reference here
 		this.add.text(this.scale.width - 40, 40, "FS", {
 			fontSize: '20px',
 			color: '#ffffff'
-		}).setOrigin(0.5).setScrollFactor(0).setDepth(32);
+		})
+		.setOrigin(0.5)
+		.setScrollFactor(0)
+		.setDepth(32)
+		.setName('fsText');
 
 		// Set up click event for fullscreen toggle
 		fsButton.on('pointerdown', () => {
 			this.toggleFullscreen();
 		});
-	}
-
-	// Request fullscreen mode
-	requestFullscreen() {
-		if (!this.scale.isFullscreen) {
-			this.scale.startFullscreen();
-		}
 	}
 
 	// Toggle fullscreen mode
@@ -406,22 +487,7 @@ export default class MainScene extends Phaser.Scene {
 		} else {
 			this.scale.startFullscreen();
 		}
-	}
-
-	// Adjust game elements for fullscreen
-	adjustForFullscreen() {
-		// Resize game view if needed
-		const width = window.innerWidth;
-		const height = window.innerHeight;
-		
-		// Adjust game objects for new screen size if necessary
-		if (this.mainOverlay) {
-			this.mainOverlay.setPosition(width / 2, height / 2);
-			const overlayScaleX = width / this.mainOverlay.width;
-			const overlayScaleY = height / this.mainOverlay.height;
-			const overlayScale = Math.max(overlayScaleX, overlayScaleY); 
-			this.mainOverlay.setScale(overlayScale);
-		}
+		// Don't call adjustForFullscreen here - the event listeners will handle it
 	}
 
 	// Create mobile touch controls
@@ -471,7 +537,8 @@ export default class MainScene extends Phaser.Scene {
 		// Add a semi-transparent background for the controls
 		this.add.rectangle(width/2, controlsY, width, buttonSize, 0x000000, 0.2)
 			.setScrollFactor(0)
-			.setDepth(29); // Place behind the buttons but above the overlay
+			.setDepth(29)
+			.setName('controlsBg'); // Name it for easier reference later
 	}
 
 	// Helper methods to check if mobile buttons are pressed
