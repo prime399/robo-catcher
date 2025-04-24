@@ -40,7 +40,7 @@
                 "url": "assets/robot2/rb2maskedall.png",
                 "frameConfig": {
                     "frameWidth": 32,
-                    "frameHeight": 48,
+                    "frameHeight": 32,
                     "startFrame": 0,
                     "endFrame": -1,
                     "spacing": 0,
@@ -48,19 +48,6 @@
                 },
                 "type": "spritesheet",
                 "key": "rb2maskedall"
-            },
-            {
-                "url": "assets/robot2/robo2masked/robo2jump-Sheet[48height32wide].png",
-                "frameConfig": {
-                    "frameWidth": 32,
-                    "frameHeight": 48,
-                    "startFrame": 0,
-                    "endFrame": -1,
-                    "spacing": 0,
-                    "margin": 0
-                },
-                "type": "spritesheet",
-                "key": "robo2jump-Sheet[48height32wide]"
             },
             {
                 "atlasURL": "assets/robot2/palyerrobo2masked/robo2masked.json",

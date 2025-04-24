@@ -7,7 +7,8 @@ import Phaser from "phaser";
 export default class Player extends Phaser.GameObjects.Sprite {
 
     constructor(scene: Phaser.Scene, x?: number, y?: number, texture?: string, frame?: number | string) {
-        super(scene, x ?? 0, y ?? 0, texture || "robo2run-Sheet[32height32wide]", frame ?? 0);
+        // Use rb2maskedall texture as default (32x32 sprite)
+        super(scene, x ?? 0, y ?? 0, texture || "rb2maskedall", frame ?? 9);
 
         // Don't set default scale here, let the scene files control it
         // this.scaleX = 2;
@@ -23,13 +24,13 @@ export default class Player extends Phaser.GameObjects.Sprite {
         // Set up physics body
         const body = this.body as Phaser.Physics.Arcade.Body;
         body.setCollideWorldBounds(true);
-        // Set hitbox size
+        // Set hitbox size - consistent for all 32x32 sprites
         body.setSize(20, 24); // Wider (20px), lower half height (24px)
-        // Set initial offset for idle animation (48px height)
-        body.setOffset(6, 24);
+        // Set offset for 32x32 sprites
+        body.setOffset(6, 8);
         
         // Start with idle animation
-        this.play("robo idle", true);
+        this.play("robot idle", true);
         
         // Set depth to ensure visibility
         this.setDepth(20);
@@ -53,12 +54,14 @@ export default class Player extends Phaser.GameObjects.Sprite {
         return player;
     }
     
+    // Keep track of current animation to avoid unnecessary changes
+    private currentAnimation: string = "robot idle";
+    
     // Update method to handle player movement
     update(cursors: Phaser.Types.Input.Keyboard.CursorKeys, leftButtonPressed: boolean = false, rightButtonPressed: boolean = false, jumpButtonPressed: boolean = false, dashButtonPressed: boolean = false): void {
 
         // Declare variables ONCE
-        let targetAnimKey: string | null = "robo idle"; // Default to idle
-        let targetOffsetY: number = 24; // Default offset for idle (48px frame)
+        let targetAnimKey: string = "robot idle"; // Default to idle
         const onGround = this.body.blocked.down;
 
         // Horizontal Movement & Animation
@@ -67,48 +70,49 @@ export default class Player extends Phaser.GameObjects.Sprite {
             this.setFlipX(true);
             if (onGround) { // Only run anim if on ground
                  targetAnimKey = "robot running";
-                 targetOffsetY = 8; // Offset for 32px frame
             }
         } else if (cursors.right?.isDown || rightButtonPressed) {
             this.body.setVelocityX(this.speed);
             this.setFlipX(false);
              if (onGround) { // Only run anim if on ground
                  targetAnimKey = "robot running";
-                 targetOffsetY = 8; // Offset for 32px frame
              }
         } else {
             // Idle state (if on ground)
             this.body.setVelocityX(0);
             if (onGround) {
-                targetAnimKey = "robo idle";
-                targetOffsetY = 24; // Offset for 48px frame
+                targetAnimKey = "robot idle";
+            } else {
+                 // If not moving horizontally AND not on ground, default to jump/fall anim
+                 targetAnimKey = "robot jumping";
             }
         }
 
         // Jump Logic
         if ((cursors.up?.isDown || jumpButtonPressed) && onGround) {
             this.body.setVelocityY(-this.jumpPower);
-            // Jump animation will be set below if airborne
+            targetAnimKey = "robot jumping"; // Set jump anim immediately
         }
 
         // Dash Logic & Animation (Overrides other ground animations)
         if (cursors.down?.isDown || dashButtonPressed) {
              targetAnimKey = "robot dash";
-             targetOffsetY = 8; // Offset for 32px frame
-             // Optional: Add dash velocity logic here if needed
         }
 
-        // Airborne Animation (Overrides ground/idle anims if not dashing)
+        // Airborne Animation Check (redundant if handled above, but safe)
         if (!onGround && targetAnimKey !== "robot dash") {
+            // Ensure jump anim is set if airborne, unless dashing
             targetAnimKey = "robot jumping";
-            targetOffsetY = 24; // Offset for 48px frame
         }
 
-        // Change animation and offset only if needed
-        if (targetAnimKey && this.anims.currentAnim?.key !== targetAnimKey) {
-            // Set offset BEFORE playing animation
-            this.body.setOffset(6, targetOffsetY); // Use determined offset
+        // Only play a new animation if it's different from our tracked current animation
+        if (this.currentAnimation !== targetAnimKey) {
+            // Stop any current animation before starting a new one
+            this.anims.stop();
+            
+            // Play the new animation and update our tracking variable
             this.play(targetAnimKey, true);
+            this.currentAnimation = targetAnimKey;
         }
 
         // Removed manual bounds checking - Handled by physics world bounds now
